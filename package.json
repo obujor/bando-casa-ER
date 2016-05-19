@@ -12,8 +12,29 @@
     "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs"
   },
   "dependencies": {
+    "babel-runtime": "^6.0.0",
+    "jquery": "^2.2.3",
+    "lz-string": "^1.4.4",
+    "semantic-ui-container": "^2.1.7",
+    "semantic-ui-dimmer": "^2.1.7",
+    "semantic-ui-dropdown": "^2.1.7",
+    "semantic-ui-form": "^2.1.7",
+    "semantic-ui-grid": "^2.1.7",
+    "semantic-ui-icon": "^2.1.7",
+    "semantic-ui-image": "^2.1.7",
+    "semantic-ui-input": "^2.1.7",
+    "semantic-ui-label": "^2.1.7",
+    "semantic-ui-loader": "^2.1.7",
+    "semantic-ui-menu": "^2.1.7",
+    "semantic-ui-progress": "^2.1.7",
+    "semantic-ui-reset": "^2.1.7",
+    "semantic-ui-segment": "^2.1.7",
+    "semantic-ui-site": "^2.1.7",
+    "semantic-ui-transition": "^2.1.7",
+    "semantic-ui-visibility": "^2.1.7",
+    "underscore": "^1.8.3",
     "vue": "^1.0.21",
-    "babel-runtime": "^6.0.0"
+    "vue-resource": "^0.7.0"
   },
   "devDependencies": {
     "babel-core": "^6.0.0",

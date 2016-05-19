@@ -1,64 +1,152 @@
 <template>
+
   <div id="app">
-    <img class="logo" src="./assets/logo.png">
-    <hello></hello>
-    <p>
-      Welcome to your Vue.js app!
-    </p>
-    <p>
-      To get a better understanding of how this boilerplate works, check out
-      <a href="http://vuejs-templates.github.io/webpack" target="_blank">its documentation</a>.
-      It is also recommended to go through the docs for
-      <a href="http://webpack.github.io/" target="_blank">Webpack</a> and
-      <a href="http://vuejs.github.io/vue-loader/" target="_blank">vue-loader</a>.
-      If you have any issues with the setup, please file an issue at this boilerplate's
-      <a href="https://github.com/vuejs-templates/webpack" target="_blank">repository</a>.
-    </p>
-    <p>
-      You may also want to checkout
-      <a href="https://github.com/vuejs/vue-router/" target="_blank">vue-router</a> for routing and
-      <a href="https://github.com/vuejs/vuex/" target="_blank">vuex</a> for state management.
-    </p>
+    <div class="toc">
+      <div class="ui left fixed vertical menu">
+        <div class="item header">
+          <a class="ui image" href="/"><img class="logo" src="./assets/logo.png"></a>
+        </div>
+        <div class="item">
+          <h3>Filtra</h3>
+          <form class="ui form">
+            <div class="field">
+              <label>Provincia</label>
+              <select multiple="multiple" class="ui dropdown" v-model="proviceFilter">
+                <option value="">Tutte</option>
+                <option v-for="province in provinces" value="{{ province }}">{{ province }}</option>
+              </select>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="ui container houseList">
+      <house-list :houses='houses'></house-list>
+      <div class="ui active centered large inline loader"></div>
+    </div>
   </div>
 </template>
 
 <script>
-import Hello from './components/Hello'
+import HouseList from './components/HouseList'
+import LZString from 'lz-string'
+import $ from 'jquery'
+import _ from 'underscore'
+window.$ = $
+import 'semantic-ui-reset/reset.css'
+import 'semantic-ui-site/site.css'
+import 'semantic-ui-container/container.css'
+import 'semantic-ui-grid/grid.css'
+import 'semantic-ui-image/image.css'
+import 'semantic-ui-menu/menu.css'
+import 'semantic-ui-form/form.css'
+import 'semantic-ui-dropdown/dropdown.css'
+import 'semantic-ui-transition/transition.css'
+import 'semantic-ui-icon/icon.css'
+import 'semantic-ui-input/input.css'
+import 'semantic-ui-label/label.css'
+import 'semantic-ui-loader/loader.css'
+import 'semantic-ui-segment/segment.css'
+import 'semantic-ui-dimmer/dimmer.css'
+
+$.fn.transition = require('semantic-ui-transition')
+$.fn.dropdown = require('semantic-ui-dropdown')
+$.fn.visibility = require('semantic-ui-visibility')
+$.fn.dimmer = require('semantic-ui-dimmer')
+
+const SLOT_SIZE = 50
 
 export default {
   components: {
-    Hello
+    HouseList
+  },
+  data () {
+    return {
+      allHouses: [],
+      proviceFilter: [],
+      slot: 1
+    }
+  },
+  computed: {
+    provinces: function () {
+      return _.uniq(this.allHouses.map(function (h) {
+        return h.indirizzo[3]
+      })).sort()
+    },
+    houses: function () {
+      var provSelected = this.proviceFilter
+      var houses = this.allHouses
+      console.time('filter')
+      if (provSelected.length) {
+        houses = houses.filter(function (h) {
+          return provSelected.indexOf(h.indirizzo[3]) !== -1
+        })
+      }
+      console.timeEnd('filter')
+      var end = SLOT_SIZE * this.slot
+      console.log(this.slot, houses.length)
+
+      if (end < houses.length) {
+        $('.houseList .loader').addClass('active')
+      } else {
+        $('.houseList .loader').removeClass('active')
+      }
+      return houses.slice(0, end)
+    }
+  },
+  watch: {
+    'proviceFilter': function (val, oldVal) {
+      this.slot = 1
+    }
+  },
+  ready: function () {
+    // GET request
+    this.$http({url: '/static/data_2015_lz.json', method: 'GET'}).then(function (response) {
+      var data = JSON.parse(LZString.decompressFromUTF16(response.data))
+      this.$set('allHouses', data)
+    })
+    var vue = this
+    $('select.dropdown').dropdown()
+    $('#app .houseList').visibility({
+      once: false,
+      // update size when new content loads
+      observeChanges: true,
+      // load content on bottom edge visible
+      onBottomVisible: function () {
+        if (vue.allHouses.length) {
+          vue.slot++
+        }
+      }
+    })
   }
 }
 </script>
 
 <style>
-html {
-  height: 100%;
-}
-
-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
-
 #app {
   color: #2c3e50;
-  margin-top: -100px;
-  max-width: 600px;
   font-family: Source Sans Pro, Helvetica, sans-serif;
-  text-align: center;
+  display: flex;
+  flex-direction: row;
 }
 
-#app a {
-  color: #42b983;
-  text-decoration: none;
+#app > .toc {
+    flex: 0 0 auto;
+    position: relative;
+    width: 300px;
+    z-index: 1;
 }
 
 .logo {
   width: 100px;
   height: 100px
+}
+
+.menu .item.header {
+  padding: 0 1.14286em;
+}
+
+body .ui.vertical.menu {
+  width: 20rem;
 }
 </style>
