@@ -28,20 +28,25 @@
       </div>
     </div>
     <div class="ui container houseList">
-      <div class="ui borderless menu listStatus">
-        <div class="ui text container">
-          <div href="#" class="header item">
-            Alloggi visualizzati {{houses.length}}/{{housesFiltered.length}}
+      <div class="item listStatus">
+        <div class="ui blue attached top progress">
+          <div class="bar"></div>
+        </div>
+        <div class="ui borderless menu">
+          <div class="ui text container">
+            <div href="#" class="header item">
+              Alloggi visualizzati {{houses.length}}/{{housesFiltered.length}}
+            </div>
+            <select class="ui right floated dropdown item listOrdering" v-model="listOrder">
+              <option value="">Ordinamento</option>
+              <option value="mc">Meno costosi</option>
+              <option value="mcmq">Meno costosi al m²</option>
+              <option value="ms">Meno spaziosi</option>
+              <option value="pc">Più costosi</option>
+              <option value="pcmq">Più costosi al m²</option>
+              <option value="ps">Più spaziosi</option>
+            </select>
           </div>
-          <select class="ui right floated dropdown item listOrdering" v-model="listOrder">
-            <option value="">Ordinamento</option>
-            <option value="mc">Meno costosi</option>
-            <option value="mcmq">Meno costosi al m²</option>
-            <option value="ms">Meno spaziosi</option>
-            <option value="pc">Più costosi</option>
-            <option value="pcmq">Più costosi al m²</option>
-            <option value="ps">Più spaziosi</option>
-          </select>
         </div>
       </div>
       <house-list :houses='houses'></house-list>
@@ -72,11 +77,13 @@ import 'semantic-ui-loader/loader.css'
 import 'semantic-ui-segment/segment.css'
 import 'semantic-ui-dimmer/dimmer.css'
 import 'semantic-ui-list/list.css'
+import 'semantic-ui-progress/progress.css'
 
 $.fn.transition = require('semantic-ui-transition')
 $.fn.dropdown = require('semantic-ui-dropdown')
 $.fn.visibility = require('semantic-ui-visibility')
 $.fn.dimmer = require('semantic-ui-dimmer')
+$.fn.progress = require('semantic-ui-progress')
 
 const SLOT_SIZE = 50
 
@@ -133,7 +140,6 @@ export default {
     housesOrdered: function () {
       var houses = this.housesFiltered
       var order = this.listOrder
-
       var sortAsc = function (prop) {
         return houses.sort(function (a, b) {
           return a[prop] - b[prop]
@@ -170,7 +176,9 @@ export default {
       } else {
         $('.houseList .loader').removeClass('active')
       }
-      return this.housesOrdered.slice(0, end)
+      var houses = this.housesOrdered.slice(0, end)
+      $('.listStatus .progress').progress({percent: houses.length / this.housesOrdered.length * 100})
+      return houses
     }
   },
   watch: {
@@ -179,6 +187,7 @@ export default {
     }
   },
   ready: function () {
+    var vue = this
     // GET request
     this.$http({url: '/static/data_2015_lz.json', method: 'GET'}).then(function (response) {
       var data = JSON.parse(LZString.decompressFromUTF16(response.data))
@@ -190,7 +199,6 @@ export default {
       })
       this.$set('allHouses', data)
     })
-    var vue = this
     $('.toc select.dropdown').dropdown({
       action: 'combo'
     })
@@ -207,8 +215,11 @@ export default {
         }
       }
     })
-    $('.listStatus.menu').visibility({
+    $('.listStatus').visibility({
       type: 'fixed'
+    })
+    $('.houseList .progress').progress({
+      percent: 0
     })
   }
 }
@@ -234,14 +245,23 @@ export default {
   width: 100px;
   height: 100px
 }
-
-.listStatus.menu.fixed {
+.listStatus {
+  width: 100%;
+  background-color: #FFFFFF;
+}
+.listStatus .ui.menu {
   background-color: #FFFFFF;
   border: 1px solid #DDD;
   border-left: 0px;
   border-top: 0px;
   border-right: 0px;
   box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.2);
+  margin: 0;
+  border-radius: 0;
+}
+
+.listStatus .ui.progress.top.attached, .listStatus .ui.progress.top.attached .bar {
+  border-radius: 0;
 }
 
 .menu .item.header {
