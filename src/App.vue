@@ -16,6 +16,13 @@
                 <option v-for="province in provinces" value="{{ province }}">{{ province }}</option>
               </select>
             </div>
+            <div class="field">
+              <label>Città</label>
+              <select multiple="multiple" class="ui dropdown" v-model="cityFilter">
+                <option value="">Tutte</option>
+                <option v-for="city in cities" value="{{ city }}">{{ city | capitalizeWords }}</option>
+              </select>
+            </div>
           </form>
         </div>
       </div>
@@ -65,6 +72,7 @@ export default {
     return {
       allHouses: [],
       proviceFilter: [],
+      cityFilter: [],
       slot: 1
     }
   },
@@ -74,13 +82,31 @@ export default {
         return h.indirizzo[3]
       })).sort()
     },
+    cities: function () {
+      var provSelected = this.proviceFilter
+      var houses = this.allHouses
+      if (provSelected.length) {
+        houses = houses.filter(function (h) {
+          return provSelected.indexOf(h.indirizzo[3]) !== -1
+        })
+      }
+      return _.uniq(houses.map(function (h) {
+        return h.indirizzo[2]
+      })).sort()
+    },
     houses: function () {
       var provSelected = this.proviceFilter
+      var citySelected = this.cityFilter
       var houses = this.allHouses
       console.time('filter')
       if (provSelected.length) {
         houses = houses.filter(function (h) {
           return provSelected.indexOf(h.indirizzo[3]) !== -1
+        })
+      }
+      if (citySelected.length) {
+        houses = houses.filter(function (h) {
+          return citySelected.indexOf(h.indirizzo[2]) !== -1
         })
       }
       console.timeEnd('filter')
@@ -113,7 +139,9 @@ export default {
       this.$set('allHouses', data)
     })
     var vue = this
-    $('select.dropdown').dropdown()
+    $('select.dropdown').dropdown({
+      action: 'combo'
+    })
     $('#app .houseList').visibility({
       once: false,
       // update size when new content loads
