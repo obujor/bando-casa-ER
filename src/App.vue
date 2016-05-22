@@ -48,6 +48,7 @@ import 'semantic-ui-label/label.css'
 import 'semantic-ui-loader/loader.css'
 import 'semantic-ui-segment/segment.css'
 import 'semantic-ui-dimmer/dimmer.css'
+import 'semantic-ui-list/list.css'
 
 $.fn.transition = require('semantic-ui-transition')
 $.fn.dropdown = require('semantic-ui-dropdown')
@@ -103,6 +104,12 @@ export default {
     // GET request
     this.$http({url: '/static/data_2015_lz.json', method: 'GET'}).then(function (response) {
       var data = JSON.parse(LZString.decompressFromUTF16(response.data))
+      data = data.map(function (item) {
+        item.locali = item.supUtile.soggiorno !== undefined ? 1 : 0
+        item.locali += (item.supUtile.camere && item.supUtile.camere.length)
+                        ? item.supUtile.camere.length : 0
+        return item
+      })
       this.$set('allHouses', data)
     })
     var vue = this
@@ -120,6 +127,7 @@ export default {
     })
   }
 }
+
 </script>
 
 <style>
