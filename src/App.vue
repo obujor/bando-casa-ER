@@ -147,13 +147,8 @@ export default {
     z-index: 1;
 }
 
-.logo {
-  width: 100px;
-  height: 100px
-}
-
-.menu .item.header {
-  padding: 0 1.14286em;
+#app .menu .item.header {
+  padding: 0 0.2em;
 }
 
 body .ui.vertical.menu {
