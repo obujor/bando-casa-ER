@@ -99,7 +99,8 @@ export default {
         $('.houseList .loader').removeClass('active')
       }
       var houses = this.housesOrdered.slice(0, end)
-      $('.listStatus .progress').progress({percent: houses.length / this.housesOrdered.length * 100})
+      updateProgress(houses.length / this.housesOrdered.length * 100)
+
       return houses
     }
   },
@@ -126,11 +127,19 @@ export default {
     $('.listStatus').visibility({
       type: 'fixed'
     })
-    $('.houseList .progress').progress({
-      percent: 0
-    })
+    updateProgress()
   }
 }
+
+var updateProgress = function (percent) {
+  percent = percent || 0
+  $('.houseList .progress').progress({
+    percent: percent,
+    showActivity: false,
+    autoSuccess: false
+  })
+}
+
 </script>
 
 <style scoped>
@@ -152,6 +161,12 @@ export default {
   .listStatus .ui.progress.top.attached, .listStatus .ui.progress.top.attached .bar {
     border-radius: 0;
   }
+
+  .houseList .ui.list > .item {
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+
   .mq:after {
     content: ' m²';
   }
