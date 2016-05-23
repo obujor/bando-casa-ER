@@ -27,31 +27,7 @@
         </div>
       </div>
     </div>
-    <div class="ui container houseList">
-      <div class="item listStatus">
-        <div class="ui blue attached top progress">
-          <div class="bar"></div>
-        </div>
-        <div class="ui borderless menu">
-          <div class="ui text container">
-            <div href="#" class="header item">
-              Alloggi visualizzati {{houses.length}}/{{housesFiltered.length}}
-            </div>
-            <select class="ui right floated dropdown item listOrdering" v-model="listOrder">
-              <option value="">Ordinamento</option>
-              <option value="mc">Meno costosi</option>
-              <option value="mcmq">Meno costosi al m²</option>
-              <option value="ms">Meno spaziosi</option>
-              <option value="pc">Più costosi</option>
-              <option value="pcmq">Più costosi al m²</option>
-              <option value="ps">Più spaziosi</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <house-list :houses='houses'></house-list>
-      <div class="ui active centered large inline loader"></div>
-    </div>
+    <house-list :houses='housesFiltered'></house-list>
   </div>
 </template>
 
@@ -85,8 +61,6 @@ $.fn.visibility = require('semantic-ui-visibility')
 $.fn.dimmer = require('semantic-ui-dimmer')
 $.fn.progress = require('semantic-ui-progress')
 
-const SLOT_SIZE = 50
-
 export default {
   components: {
     HouseList
@@ -95,9 +69,7 @@ export default {
     return {
       allHouses: [],
       proviceFilter: [],
-      cityFilter: [],
-      listOrder: '',
-      slot: 1
+      cityFilter: []
     }
   },
   computed: {
@@ -122,7 +94,9 @@ export default {
       var provSelected = this.proviceFilter
       var citySelected = this.cityFilter
       var houses = this.allHouses
-      this.slot = 1
+
+      this.$broadcast('filtersChanged')
+
       console.time('filter')
       if (provSelected.length) {
         houses = houses.filter(function (h) {
@@ -136,58 +110,9 @@ export default {
       }
       console.timeEnd('filter')
       return houses
-    },
-    housesOrdered: function () {
-      var houses = this.housesFiltered
-      var order = this.listOrder
-      var sortAsc = function (prop) {
-        return houses.sort(function (a, b) {
-          return a[prop] - b[prop]
-        })
-      }
-
-      var sortDesc = function (prop) {
-        return houses.sort(function (a, b) {
-          return b[prop] - a[prop]
-        })
-      }
-
-      switch (order) {
-        case 'mc':
-          return sortAsc('prezzo')
-        case 'pc':
-          return sortDesc('prezzo')
-        case 'mcmq':
-          return sortAsc('prezzoMq')
-        case 'pcmq':
-          return sortDesc('prezzoMq')
-        case 'ms':
-          return sortAsc('mq')
-        case 'ps':
-          return sortDesc('mq')
-        default:
-          return houses
-      }
-    },
-    houses: function () {
-      var end = SLOT_SIZE * this.slot
-      if (end < this.housesOrdered.length) {
-        $('.houseList .loader').addClass('active')
-      } else {
-        $('.houseList .loader').removeClass('active')
-      }
-      var houses = this.housesOrdered.slice(0, end)
-      $('.listStatus .progress').progress({percent: houses.length / this.housesOrdered.length * 100})
-      return houses
-    }
-  },
-  watch: {
-    'proviceFilter': function (val, oldVal) {
-      this.slot = 1
     }
   },
   ready: function () {
-    var vue = this
     // GET request
     this.$http({url: '/static/data_2015_lz.json', method: 'GET'}).then(function (response) {
       var data = JSON.parse(LZString.decompressFromUTF16(response.data))
@@ -201,25 +126,6 @@ export default {
     })
     $('.toc select.dropdown').dropdown({
       action: 'combo'
-    })
-    $('.houseList .dropdown.listOrdering').dropdown()
-
-    $('#app .houseList').visibility({
-      once: false,
-      // update size when new content loads
-      observeChanges: true,
-      // load content on bottom edge visible
-      onBottomVisible: function () {
-        if (vue.allHouses.length) {
-          vue.slot++
-        }
-      }
-    })
-    $('.listStatus').visibility({
-      type: 'fixed'
-    })
-    $('.houseList .progress').progress({
-      percent: 0
     })
   }
 }
@@ -244,24 +150,6 @@ export default {
 .logo {
   width: 100px;
   height: 100px
-}
-.listStatus {
-  width: 100%;
-  background-color: #FFFFFF;
-}
-.listStatus .ui.menu {
-  background-color: #FFFFFF;
-  border: 1px solid #DDD;
-  border-left: 0px;
-  border-top: 0px;
-  border-right: 0px;
-  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.2);
-  margin: 0;
-  border-radius: 0;
-}
-
-.listStatus .ui.progress.top.attached, .listStatus .ui.progress.top.attached .bar {
-  border-radius: 0;
 }
 
 .menu .item.header {
