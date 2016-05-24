@@ -27,12 +27,23 @@
         </div>
       </div>
     </div>
-    <house-list :houses='housesFiltered'></house-list>
+    <!-- <div class="ui shape">
+      <div class="sides">
+        <div class="active side">
+          <house-list :houses='housesFiltered'></house-list>  -->
+        <!-- </div>
+        <div class="side">  -->
+        <mapview></mapview>
+        <!--  </div>
+      </div>
+    </div> -->
   </div>
 </template>
 
 <script>
 import HouseList from './components/HouseList'
+import Mapview from './components/Mapview'
+
 import LZString from 'lz-string'
 import $ from 'jquery'
 import _ from 'underscore'
@@ -54,16 +65,19 @@ import 'semantic-ui-segment/segment.css'
 import 'semantic-ui-dimmer/dimmer.css'
 import 'semantic-ui-list/list.css'
 import 'semantic-ui-progress/progress.css'
+import 'semantic-ui-shape/shape.css'
 
 $.fn.transition = require('semantic-ui-transition')
 $.fn.dropdown = require('semantic-ui-dropdown')
 $.fn.visibility = require('semantic-ui-visibility')
 $.fn.dimmer = require('semantic-ui-dimmer')
 $.fn.progress = require('semantic-ui-progress')
+$.fn.shape = require('semantic-ui-shape')
 
 export default {
   components: {
-    HouseList
+    HouseList,
+    Mapview
   },
   data () {
     return {
@@ -127,6 +141,7 @@ export default {
     $('.toc select.dropdown').dropdown({
       action: 'combo'
     })
+    $('.ui.shape').shape()
   }
 }
 

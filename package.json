@@ -30,11 +30,13 @@
     "semantic-ui-progress": "^2.1.7",
     "semantic-ui-reset": "^2.1.7",
     "semantic-ui-segment": "^2.1.7",
+    "semantic-ui-shape": "^2.1.7",
     "semantic-ui-site": "^2.1.7",
     "semantic-ui-transition": "^2.1.7",
     "semantic-ui-visibility": "^2.1.7",
     "underscore": "^1.8.3",
     "vue": "^1.0.21",
+    "vue-google-maps": "^0.1.17",
     "vue-resource": "^0.7.0"
   },
   "devDependencies": {

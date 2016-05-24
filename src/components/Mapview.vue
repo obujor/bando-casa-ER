@@ -1,26 +1,45 @@
 <template>
-  <div id="map" class="map"></div>
+  <map :map-type-id.sync="mapType" :center.sync="center" :zoom.sync="zoom">
+    <!-- <marker 
+      v-for="m in markers"
+      :position.sync="m.position"
+      :clickable="true"
+      :draggable="true"
+      @g-click="center=m.position"
+    ></marker> -->
+  </map>
 </template>
 
 <script>
-import L from 'leaflet'
-console.log(L)
+import {load, Map, Marker} from 'vue-google-maps'
 
+load('KEY')
+console.log(Map, Marker)
 export default {
   data () {
     return {
-      msg: 'Hello World!'
+      center: {lat: 44.4355049, lng: 10.9767866},
+      mapType: 'roadmap',
+      zoom: 8,
+      markers: [{
+        position: {lat: 10.0, lng: 10.0}
+      }, {
+        position: {lat: 11.0, lng: 11.0}
+      }]
     }
   },
-  ready: function () {
-    this.map = L.map('map').setView([44.4355049, 10.9767866], 10)
+  components: {
+    Map,
+    Marker
   }
 }
+
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-#map {
-  height: 300px; 
+map {
+  width:100%;
+  height: 600px;
+  display: block;
 }
 </style>
