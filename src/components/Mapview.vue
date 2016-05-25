@@ -1,13 +1,15 @@
 <template>
-  <map :map-type-id.sync="mapType" :center.sync="center" :zoom.sync="zoom">
-    <!-- <marker 
-      v-for="m in markers"
-      :position.sync="m.position"
-      :clickable="true"
-      :draggable="true"
-      @g-click="center=m.position"
-    ></marker> -->
-  </map>
+  <div class="mapView">
+    <map :map-type-id.sync="mapType" :center.sync="center" :zoom.sync="zoom">
+      <!-- <marker 
+        v-for="m in markers"
+        :position.sync="m.position"
+        :clickable="true"
+        :draggable="true"
+        @g-click="center=m.position"
+      ></marker> -->
+    </map>
+  </div>
 </template>
 
 <script>
@@ -37,7 +39,7 @@ export default {
 </script>
 
 <style scoped>
-map {
+.mapView, map {
   width:100%;
   height: 600px;
   display: block;

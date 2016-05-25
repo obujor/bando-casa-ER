@@ -25,18 +25,18 @@
             </div>
           </form>
         </div>
+        <div class="item">
+          <h3>Risultati</h3>
+          <div class="ui buttons">
+            <button class="ui button active showList">Elenco</button>
+            <div class="or" data-text="o"></div>
+            <button class="ui button showMap">Mappa</button>
+          </div>
+        </div>
       </div>
     </div>
-    <!-- <div class="ui shape">
-      <div class="sides">
-        <div class="active side">
-          <house-list :houses='housesFiltered'></house-list>  -->
-        <!-- </div>
-        <div class="side">  -->
-        <mapview></mapview>
-        <!--  </div>
-      </div>
-    </div> -->
+    <house-list class="houseListView" :houses='housesFiltered'></house-list>
+    <mapview class="houseMapView transition hidden"></mapview>
   </div>
 </template>
 
@@ -65,14 +65,13 @@ import 'semantic-ui-segment/segment.css'
 import 'semantic-ui-dimmer/dimmer.css'
 import 'semantic-ui-list/list.css'
 import 'semantic-ui-progress/progress.css'
-import 'semantic-ui-shape/shape.css'
+import 'semantic-ui-button/button.css'
 
 $.fn.transition = require('semantic-ui-transition')
 $.fn.dropdown = require('semantic-ui-dropdown')
 $.fn.visibility = require('semantic-ui-visibility')
 $.fn.dimmer = require('semantic-ui-dimmer')
 $.fn.progress = require('semantic-ui-progress')
-$.fn.shape = require('semantic-ui-shape')
 
 export default {
   components: {
@@ -141,7 +140,23 @@ export default {
     $('.toc select.dropdown').dropdown({
       action: 'combo'
     })
-    $('.ui.shape').shape()
+
+    var toggleView = function (showCmp, hideCmp) {
+      if ($(this).hasClass('active')) return
+      $(this).addClass('active')
+      $(this).siblings('.button').removeClass('active')
+      if (!$(showCmp).transition('is visible')) {
+        $(showCmp).transition('show')
+      }
+      $(hideCmp).transition('hide')
+    }
+
+    $('.ui.button.showList').click(function () {
+      toggleView.bind(this)('.houseListView', '.houseMapView')
+    })
+    $('.ui.button.showMap').click(function () {
+      toggleView.bind(this)('.houseMapView', '.houseListView')
+    })
   }
 }
 
