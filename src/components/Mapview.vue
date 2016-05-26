@@ -1,38 +1,80 @@
 <template>
   <div class="mapView">
     <map :map-type-id.sync="mapType" :center.sync="center" :zoom.sync="zoom">
-      <!-- <marker 
-        v-for="m in markers"
-        :position.sync="m.position"
-        :clickable="true"
-        :draggable="true"
-        @g-click="center=m.position"
-      ></marker> -->
+      <cluster :grid-size="50"
+                :styles="cluster_styles">
+        <marker
+          v-for="m in markers"
+          :position.sync="m.position"
+          :clickable.sync="m.clickable"
+          :draggable.sync="m.draggable"
+          @g-click="center=m.position"
+        ></marker>
+      </cluster>
     </map>
   </div>
 </template>
 
 <script>
-import {load, Map, Marker} from 'vue-google-maps'
+import {load, Map, Marker, Cluster} from 'vue-google-maps'
 
-load('KEY')
-console.log(Map, Marker)
+// Prevent to load multiple times
+if (!window.google || !window.google.maps) {
+  load('KEY')
+}
+
 export default {
+  props: ['houses'],
   data () {
     return {
       center: {lat: 44.4355049, lng: 10.9767866},
       mapType: 'roadmap',
       zoom: 8,
-      markers: [{
-        position: {lat: 10.0, lng: 10.0}
+      shown: false,
+      cluster_styles: [{
+        url: '/static/cluster/m1.png',
+        height: 53,
+        width: 53,
+        textColor: '#FFFFFF',
+        textSize: 14
       }, {
-        position: {lat: 11.0, lng: 11.0}
+        url: '/static/cluster/m2.png',
+        height: 56,
+        width: 56,
+        textColor: '#FFFFFF',
+        textSize: 14
+      }, {
+        url: '/static/cluster/m3.png',
+        height: 65,
+        width: 65,
+        textColor: '#FFFFFF',
+        textSize: 14
       }]
+    }
+  },
+  computed: {
+    markers: function () {
+      return this.houses.map(function (house) {
+        return {
+          position: {lat: house.geo[0], lng: house.geo[1]},
+          draggable: false,
+          clickable: true
+        }
+      })
+    }
+  },
+  events: {
+    showCmp: function (cmp) {
+      if (cmp === this && !this.shown) {
+        this.shown = true
+        this.$broadcast('g-resize-map')
+      }
     }
   },
   components: {
     Map,
-    Marker
+    Marker,
+    Cluster
   }
 }
 

@@ -35,8 +35,8 @@
         </div>
       </div>
     </div>
-    <house-list class="houseListView" :houses='housesFiltered'></house-list>
-    <mapview class="houseMapView transition hidden"></mapview>
+    <house-list v-ref:houselistview :houses='housesFiltered'></house-list>
+    <mapview class="transition hidden"  v-ref:housemapview :houses='housesFiltered'></mapview>
   </div>
 </template>
 
@@ -140,22 +140,29 @@ export default {
     $('.toc select.dropdown').dropdown({
       action: 'combo'
     })
-
+    var vue = this
     var toggleView = function (showCmp, hideCmp) {
       if ($(this).hasClass('active')) return
       $(this).addClass('active')
       $(this).siblings('.button').removeClass('active')
-      if (!$(showCmp).transition('is visible')) {
-        $(showCmp).transition('show')
+
+      var cmp = vue.$refs[showCmp]
+      if (!$(cmp.$el).transition('is visible')) {
+        $(cmp.$el).transition({
+          behavior: 'show',
+          onComplete: function () {
+            vue.$broadcast('showCmp', cmp)
+          }
+        })
       }
-      $(hideCmp).transition('hide')
+      $(vue.$refs[hideCmp].$el).transition('hide')
     }
 
     $('.ui.button.showList').click(function () {
-      toggleView.bind(this)('.houseListView', '.houseMapView')
+      toggleView.bind(this)('houselistview', 'housemapview')
     })
     $('.ui.button.showMap').click(function () {
-      toggleView.bind(this)('.houseMapView', '.houseListView')
+      toggleView.bind(this)('housemapview', 'houselistview')
     })
   }
 }
