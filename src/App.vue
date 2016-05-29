@@ -27,22 +27,22 @@
         </div>
         <div class="item">
           <h3>Risultati</h3>
-          <div class="ui buttons">
-            <button class="ui button active showList">Elenco</button>
+          <div class="ui buttons toggleView">
+            <button class="ui button active" data-show="houselistview">Elenco</button>
             <div class="or" data-text="o"></div>
-            <button class="ui button showMap">Mappa</button>
+            <button class="ui button" data-show="housemapview">Mappa</button>
           </div>
         </div>
       </div>
     </div>
     <house-list v-ref:houselistview :houses='housesFiltered'></house-list>
-    <mapview class="transition hidden"  v-ref:housemapview :houses='housesFiltered'></mapview>
+    <g-mapview v-ref:housemapview :houses='housesFiltered'></g-mapview>
   </div>
 </template>
 
 <script>
 import HouseList from './components/HouseList'
-import Mapview from './components/Mapview'
+import GMapview from './components/GMapview'
 
 import LZString from 'lz-string'
 import $ from 'jquery'
@@ -76,7 +76,7 @@ $.fn.progress = require('semantic-ui-progress')
 export default {
   components: {
     HouseList,
-    Mapview
+    GMapview
   },
   data () {
     return {
@@ -141,11 +141,13 @@ export default {
       action: 'combo'
     })
     var vue = this
-    var toggleView = function (showCmp, hideCmp) {
-      if ($(this).hasClass('active')) return
-      $(this).addClass('active')
-      $(this).siblings('.button').removeClass('active')
+    var toggleView = function ($btn) {
+      $btn.addClass('active')
+      var sib = $btn.siblings('.button')
+      var showCmp = $btn.data('show')
+      var hideCmp = sib.data('show')
 
+      sib.removeClass('active')
       var cmp = vue.$refs[showCmp]
       if (!$(cmp.$el).transition('is visible')) {
         $(cmp.$el).transition({
@@ -158,11 +160,10 @@ export default {
       $(vue.$refs[hideCmp].$el).transition('hide')
     }
 
-    $('.ui.button.showList').click(function () {
-      toggleView.bind(this)('houselistview', 'housemapview')
-    })
-    $('.ui.button.showMap').click(function () {
-      toggleView.bind(this)('housemapview', 'houselistview')
+    toggleView($('.toggleView .ui.button.active'))
+    $('.toggleView .ui.button').click(function () {
+      if ($(this).hasClass('active')) return
+      toggleView($(this))
     })
   }
 }
