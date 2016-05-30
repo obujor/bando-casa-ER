@@ -126,7 +126,6 @@ export default {
     }
   },
   ready: function () {
-    // GET request
     this.$http({url: '/static/data_2015_lz.json', method: 'GET'}).then(function (response) {
       var data = JSON.parse(LZString.decompressFromUTF16(response.data))
       data = data.map(function (item) {
