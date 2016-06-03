@@ -1,5 +1,4 @@
 <template>
-
   <div id="app">
     <div class="toc">
       <div class="ui left fixed vertical menu">
@@ -66,7 +65,7 @@
           </div>
         </div>
         <div class="item">
-          <h3>Risultati</h3>
+          <h3>Alloggi trovati {{housesFiltered.length}}</h3>
           <div class="ui buttons toggleView">
             <button class="ui button active" data-show="houselistview">Elenco</button>
             <div class="or" data-text="o"></div>
@@ -300,12 +299,15 @@ export default {
     position: relative;
     width: 280px;
     z-index: 1;
+    
+    .menu .item.header {
+      padding: 0 0.2em;
+      text-align: center;
+    }
+    
   }
 
-  .menu .item.header {
-    padding: 0 0.2em;
-    text-align: center;
-  }
+
 }
 
 .toc {

@@ -5,20 +5,18 @@
         <div class="bar"></div>
       </div>
       <div class="ui borderless menu">
-        <div class="ui text container">
-          <div href="#" class="header item">
-            Alloggi visualizzati {{housesToShow.length}}/{{housesOrdered.length}}
-          </div>
-          <select class="ui right floated dropdown item listOrdering" v-model="listOrder">
-            <option value="">Ordinamento</option>
-            <option value="mc">Meno costosi</option>
-            <option value="mcmq">Meno costosi al m²</option>
-            <option value="ms">Meno spaziosi</option>
-            <option value="pc">Più costosi</option>
-            <option value="pcmq">Più costosi al m²</option>
-            <option value="ps">Più spaziosi</option>
-          </select>
+        <div href="#" class="header item">
+          Alloggi visualizzati {{housesToShow.length}}/{{housesOrdered.length}}
         </div>
+        <select class="ui right floated dropdown item listOrdering" v-model="listOrder">
+          <option value="">Ordinamento</option>
+          <option value="mc">Meno costosi</option>
+          <option value="mcmq">Meno costosi al m²</option>
+          <option value="ms">Meno spaziosi</option>
+          <option value="pc">Più costosi</option>
+          <option value="pcmq">Più costosi al m²</option>
+          <option value="ps">Più spaziosi</option>
+        </select>
       </div>
     </div>
     <div class="ui big relaxed divided selection list">
@@ -47,6 +45,7 @@
 
 <script>
 import $ from 'jquery'
+import _ from 'underscore'
 
 const SLOT_SIZE = 50
 
@@ -109,6 +108,11 @@ export default {
       this.slot = 1
     }
   },
+  watch: {
+    houses: function () {
+      this.updateWidth()
+    }
+  },
   ready: function () {
     var vue = this
     $('.houseList .dropdown.listOrdering').dropdown()
@@ -128,6 +132,13 @@ export default {
       type: 'fixed'
     })
     updateProgress()
+    $(window).resize(_.debounce(this.updateWidth, 100))
+  },
+  methods: {
+    updateWidth: () => {
+      console.log($('.houseList').width())
+      $('.listStatus').width($('.houseList').width())
+    }
   }
 }
 
@@ -142,24 +153,28 @@ var updateProgress = function (percent) {
 
 </script>
 
-<style scoped>
+<style lang="less">
   .listStatus {
-    width: 100%;
+    width: 100%; 
     background-color: #FFFFFF;
-  }
-  .listStatus .ui.menu {
-    background-color: #FFFFFF;
-    border: 1px solid #DDD;
-    border-left: 0px;
-    border-top: 0px;
-    border-right: 0px;
-    box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.2);
-    margin: 0;
-    border-radius: 0;
-  }
+    .ui.menu {
+      background-color: #FFFFFF;
+      border: 1px solid #DDD;
+      border-left: 0px;
+      border-top: 0px;
+      border-right: 0px;
+      box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.2);
+      margin: 0;
+      border-radius: 0;
+    }
 
-  .listStatus .ui.progress.top.attached, .listStatus .ui.progress.top.attached .bar {
-    border-radius: 0;
+    .ui.right.listOrdering {
+      margin-right: 2em;
+    }
+
+    .ui.progress.top.attached,.ui.progress.top.attached .bar {
+      border-radius: 0;
+    }
   }
 
   .houseList .ui.list > .item {
