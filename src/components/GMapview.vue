@@ -1,14 +1,42 @@
 <template>
   <div class="mapView">
-    <map :map-type-id.sync="mapType" :center.sync="center" :zoom.sync="zoom">
+    <map :map-type-id.sync="mapType" :center.sync="center" :zoom.sync="zoom" :options="{minZoom: 8}"
+          @g-dragend="mapDragged" @g-click="mapClicked">
       <polygon :paths.sync="border" :editable="false" :options="{geodesic:false, strokeColor:'#000000', fillColor:'#000000', strokeWeight: 2}">
       </polygon>
+      <polyline v-if="filterPathVisible" :path.sync="filterPath" :editable="true" :options="{strokeColor:'#2185d0', strokeWeight: 5}" @g-click="pathClicked">
+      </polyline>
     </map>
+    <div class="ui dimmer">
+      <div class="content">
+        <div class="center">
+          <h2 class="ui inverted icon header">
+            <i class="paint brush icon"></i>
+            Disegna un'area sulla mappa
+          </h2>
+          <h3 class="ui inverted header">
+            Clicca sulla mappa per creare un poligono relativo all'area di ricerca che ti interessa
+          </h2>
+        </div>
+      </div>
+    </div>
+    <div class="pathActions ui container transition hidden">
+      <div class="ui buttons">
+        <button class="ui button icon erasePath">
+          <i class="erase icon"></i>Cancella
+        </button>
+        <div class="or" data-text="o"></div>
+        <button class="ui button positive icon confirmPath">
+          <i class="checkmark icon"></i>
+          Conferma
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import {load, Map, Polygon} from 'vue-google-maps'
+import {load, Map, Polygon, Polyline} from 'vue-google-maps'
 import $ from 'jquery'
 // Using directly js-marker-clusterer instead of Marker and Cluser of vue-google-maps
 // because of performace reasons, there're a lot of markers to show
@@ -50,7 +78,10 @@ export default {
       mapType: 'roadmap',
       zoom: 8,
       shown: false,
-      border: []
+      limitBounds: [{lat: 43.23050, lng: 9.50790}, {lat: 45.82774, lng: 12.97657}],
+      border: [],
+      filterPathVisible: false,
+      filterPath: []
     }
   },
   computed: {
@@ -71,6 +102,10 @@ export default {
         this.shown = true
         this.$broadcast('g-resize-map')
       }
+    },
+    mapFilter: function () {
+      $('.mapView .dimmer').dimmer('show')
+      this.$set('filterPathVisible', true)
     }
   },
   watch: {
@@ -86,6 +121,35 @@ export default {
       return this.markers.map(function (data) {
         return new window.google.maps.Marker(data)
       })
+    },
+    mapClicked: function (mouseArgs) {
+      if (this.filterPathVisible) {
+        this.filterPath.push(mouseArgs.latLng)
+      }
+    },
+    pathClicked: function (args) {
+      if (args.vertex === 0) {
+        // Close the polygon
+        this.filterPath.push(this.filterPath[0])
+        $('.pathActions').removeClass('hidden')
+      }
+      console.log(args)
+    },
+    mapDragged: function () {
+      // TODO: finish the limit
+      // console.log(this.center)
+      // if (this.strictBounds.contains(this.mapObject.getCenter())) return
+      // // Set the center in order to limit the dragging
+      // var lat = this.center.lat
+      // var lng = this.center.lng
+      // if (lat < this.limitBounds[0].lat) lat = this.limitBounds[0].lat
+      // if (lat > this.limitBounds[1].lat) lat = this.limitBounds[1].lat
+      // if (lng < this.limitBounds[0].lng) lng = this.limitBounds[0].lng
+      // if (lng > this.limitBounds[1].lng) lng = this.limitBounds[1].lng
+
+      // this.$set('center', {lat: lat, lng: lng})
+      // console.log('dragged')
+      // console.log(this)
     }
   },
   ready: function () {
@@ -99,21 +163,42 @@ export default {
     })
     $('.mapView, map').height($(window).height())
     var mapCmp = cmp.$children[0]
-    mapCmp.mapCreated.then(function (mapObject) {
+    mapCmp.mapCreated.then((mapObject) => {
       cmp.$clusterObject = new window.MarkerClusterer(mapObject, cmp.createGmarkers(), clusterOptions)
+      var strictBounds = new window.google.maps.LatLngBounds(
+        new window.google.maps.LatLng(cmp.limitBounds[0].lat, cmp.limitBounds[0].lng),
+        new window.google.maps.LatLng(cmp.limitBounds[1].lat, cmp.limitBounds[1].lng)
+      )
+      cmp.strictBounds = strictBounds
+      cmp.mapObject = mapObject
+    })
+
+    $('.pathActions .erasePath').click(() => {
+      cmp.filterPath = []
+      $('.pathActions').addClass('hidden')
     })
   },
   components: {
     Map,
-    Polygon
+    Polygon,
+    Polyline
   }
 }
 
 </script>
 
-<style scoped>
+<style scoped lang="less">
 .mapView, map {
   width: 100%;
   height: 600px;
+}
+.pathActions {
+  position: absolute;
+  bottom: 20px;
+  text-align: center;
+
+  .buttons {
+    width: 50%;
+  }
 }
 </style>

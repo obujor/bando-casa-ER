@@ -29,6 +29,15 @@
                   </select>
                 </div>
               </form>
+              <div class="ui center aligned basic segment">
+                <div class="ui horizontal divider">
+                  Oppure
+                </div>
+                <div class="ui blue labeled icon button drawOnMap">
+                  Disegna sulla mappa
+                  <i class="map icon"></i>
+                </div>
+              </div>
             </div>
             <div class="title">
               <i class="dropdown icon"></i>
@@ -66,10 +75,17 @@
         </div>
         <div class="item">
           <h3>Alloggi trovati {{housesFiltered.length}}</h3>
-          <div class="ui buttons toggleView">
-            <button class="ui button active" data-show="houselistview">Elenco</button>
-            <div class="or" data-text="o"></div>
-            <button class="ui button" data-show="housemapview">Mappa</button>
+          <div class="ui center aligned basic segment">
+            <div class="ui buttons toggleView">
+              <button class="ui button icon active houseListToggle" data-show="houselistview">
+                <i class="list layout icon"></i>Elenco
+              </button>
+              <div class="or" data-text="o"></div>
+              <button class="ui button icon houseMapToggle" data-show="housemapview">
+                <i class="map icon"></i>
+                Mappa
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -104,6 +120,7 @@ import 'semantic-ui-list/list.css'
 import 'semantic-ui-progress/progress.css'
 import 'semantic-ui-button/button.css'
 import 'semantic-ui-accordion/accordion.css'
+import 'semantic-ui-divider/divider.css'
 import 'ion-rangeslider/css/ion.rangeSlider.css'
 import 'ion-rangeslider/css/ion.rangeSlider.skinFlat.css'
 require('ion-rangeslider')
@@ -220,7 +237,10 @@ export default {
       action: 'combo'
     })
     $('.ui.accordion').accordion()
-
+    $('.drawOnMap').click(() => {
+      this.toggleView($('.toggleView .houseMapToggle'))
+      this.$broadcast('mapFilter')
+    })
     this.setupToggleView()
   },
   methods: {
@@ -257,30 +277,30 @@ export default {
     },
     setupToggleView: function () {
       const vue = this
-      const toggleView = function ($btn) {
-        $btn.addClass('active')
-        const sib = $btn.siblings('.button')
-        const showCmp = $btn.data('show')
-        const hideCmp = sib.data('show')
-
-        sib.removeClass('active')
-        const cmp = vue.$refs[showCmp]
-        if (!$(cmp.$el).transition('is visible')) {
-          $(cmp.$el).transition({
-            behavior: 'show',
-            onComplete: function () {
-              vue.$broadcast('showCmp', cmp)
-            }
-          })
-        }
-        $(vue.$refs[hideCmp].$el).transition('hide')
-      }
-
-      toggleView($('.toggleView .ui.button.active'))
+      vue.toggleView($('.toggleView .ui.button.active'))
       $('.toggleView .ui.button').click(function () {
         if ($(this).hasClass('active')) return
-        toggleView($(this))
+        vue.toggleView($(this))
       })
+    },
+    toggleView: function ($btn) {
+      $btn.addClass('active')
+      const sib = $btn.siblings('.button')
+      const showCmp = $btn.data('show')
+      const hideCmp = sib.data('show')
+      const vue = this
+
+      sib.removeClass('active')
+      const cmp = vue.$refs[showCmp]
+      if (!$(cmp.$el).transition('is visible')) {
+        $(cmp.$el).transition({
+          behavior: 'show',
+          onComplete: function () {
+            vue.$broadcast('showCmp', cmp)
+          }
+        })
+      }
+      $(vue.$refs[hideCmp].$el).transition('hide')
     }
   }
 }
@@ -304,10 +324,13 @@ export default {
       padding: 0 0.2em;
       text-align: center;
     }
+
+    .ui.segment {
+      margin: 0;
+      padding: 0;
+    }
     
   }
-
-
 }
 
 .toc {
