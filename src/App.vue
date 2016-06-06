@@ -37,6 +37,20 @@
                   Disegna sulla mappa
                   <i class="map icon"></i>
                 </div>
+                <div v-show="selectedMapArea" class="selectedArea">
+                  <div class="ui large label">
+                    Area scelta
+                    <div class="detail supArea">{{Math.round(selectedMapArea)}}</div>
+                    <i class="delete icon"></i>
+                  </div>
+                  <div class="ui fluid popup">
+                    <h4 class="ui header">Sei sicuro di voler eliminare l'area selezionata?</h4>
+                    <div class="ui buttons">
+                      <div class="ui positive button">No</div>
+                      <div class="ui negative button">Sì</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="title">
@@ -121,6 +135,7 @@ import 'semantic-ui-progress/progress.css'
 import 'semantic-ui-button/button.css'
 import 'semantic-ui-accordion/accordion.css'
 import 'semantic-ui-divider/divider.css'
+import 'semantic-ui-popup/popup.css'
 import 'ion-rangeslider/css/ion.rangeSlider.css'
 import 'ion-rangeslider/css/ion.rangeSlider.skinFlat.css'
 require('ion-rangeslider')
@@ -133,6 +148,7 @@ $.fn.visibility = require('semantic-ui-visibility')
 $.fn.dimmer = require('semantic-ui-dimmer')
 $.fn.progress = require('semantic-ui-progress')
 $.fn.accordion = require('semantic-ui-accordion')
+$.fn.popup = require('semantic-ui-popup')
 
 export default {
   components: {
@@ -147,7 +163,9 @@ export default {
       priceRange: [],
       priceMqRange: [],
       locRange: [],
-      mqRange: []
+      mqRange: [],
+      mapFilterFn: false,
+      selectedMapArea: 0
     }
   },
   computed: {
@@ -183,6 +201,7 @@ export default {
       const priceMqRange = this.priceMqRange
       const locRange = this.locRange
       const mqRange = this.mqRange
+      const mapFilterFn = this.mapFilterFn
 
       const rangeFilter = (attr, range, item) => {
         return item[attr] >= range[0] && item[attr] <= range[1]
@@ -190,15 +209,21 @@ export default {
 
       var houses = this.allHouses
       console.time('filter')
-      if (provSelected.length) {
+      if (mapFilterFn) {
         houses = houses.filter((h) => {
-          return provSelected.indexOf(h.indirizzo[3]) !== -1
+          return mapFilterFn(h.geo)
         })
-      }
-      if (citySelected.length) {
-        houses = houses.filter((h) => {
-          return citySelected.indexOf(h.indirizzo[2]) !== -1
-        })
+      } else {
+        if (provSelected.length) {
+          houses = houses.filter((h) => {
+            return provSelected.indexOf(h.indirizzo[3]) !== -1
+          })
+        }
+        if (citySelected.length) {
+          houses = houses.filter((h) => {
+            return citySelected.indexOf(h.indirizzo[2]) !== -1
+          })
+        }
       }
       if (priceRange.length) {
         houses = houses.filter(rangeFilter.bind(this, 'prezzo', priceRange))
@@ -220,6 +245,18 @@ export default {
   watch: {
     maxValues: function () {
       this.setupSliders()
+    },
+    selectedMapArea: function (val) {
+      if (!val) {
+        this.$set('mapFilterFn', false)
+        this.$broadcast('clearMapFilter')
+      }
+    }
+  },
+  events: {
+    mapFilterFn: function (constainsLocFn, area) {
+      this.$set('mapFilterFn', constainsLocFn)
+      this.$set('selectedMapArea', area)
     }
   },
   ready: function () {
@@ -238,10 +275,11 @@ export default {
     })
     $('.ui.accordion').accordion()
     $('.drawOnMap').click(() => {
-      this.toggleView($('.toggleView .houseMapToggle'))
+      this.toggleView($('.toggleView .houseMapToggle'), 'showMapFilter')
       this.$broadcast('mapFilter')
     })
     this.setupToggleView()
+    this.setupDeleteSelectedArea()
   },
   methods: {
     setupSliders: function () {
@@ -283,7 +321,8 @@ export default {
         vue.toggleView($(this))
       })
     },
-    toggleView: function ($btn) {
+    toggleView: function ($btn, evtName) {
+      evtName = evtName || 'showCmp'
       $btn.addClass('active')
       const sib = $btn.siblings('.button')
       const showCmp = $btn.data('show')
@@ -296,11 +335,26 @@ export default {
         $(cmp.$el).transition({
           behavior: 'show',
           onComplete: function () {
-            vue.$broadcast('showCmp', cmp)
+            vue.$broadcast(evtName, cmp)
           }
         })
       }
       $(vue.$refs[hideCmp].$el).transition('hide')
+    },
+    setupDeleteSelectedArea: function () {
+      const $popup = $('.selectedArea .delete')
+      $popup.popup({
+        popup: $('.selectedArea .popup'),
+        on: 'click'
+      })
+
+      $('.selectedArea .popup .positive').click(() => {
+        $popup.popup('hide')
+      })
+      $('.selectedArea .popup .negative').click(() => {
+        $popup.popup('hide')
+        this.$set('selectedMapArea', 0)
+      })
     }
   }
 }
@@ -356,6 +410,14 @@ export default {
 
 body .ui.vertical.menu {
   width: 20rem;
+}
+
+.selectedArea {
+  padding: 1em;
+
+  .supArea:after {
+    content: ' km²';
+  }
 }
 
 </style>
