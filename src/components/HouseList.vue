@@ -1,5 +1,5 @@
 <template>
-  <div class="ui container houseList">
+  <div class="houseList">
     <div class="item listStatus">
       <div class="ui blue attached top progress">
         <div class="bar"></div>
@@ -132,12 +132,12 @@ export default {
       type: 'fixed'
     })
     updateProgress()
-    $(window).resize(_.debounce(this.updateWidth, 100))
+    $(window).resize(_.debounce(this.updateWidth, 50))
   },
   methods: {
     updateWidth: () => {
-      console.log($('.houseList').width())
-      $('.listStatus').width($('.houseList').width())
+      $('.listStatus').width($('.houseViews').width())
+      $('.houseList').width($('.houseViews').width())
     }
   }
 }
@@ -180,6 +180,11 @@ var updateProgress = function (percent) {
   .houseList .ui.list > .item {
     padding-left: 1em;
     padding-right: 1em;
+  }
+
+  .houseList {
+    width: 100%;
+    position: relative;
   }
 
   .mq:after {

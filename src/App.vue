@@ -40,7 +40,7 @@
                 <div v-show="selectedMapArea" class="selectedArea">
                   <div class="ui large label">
                     Area scelta
-                    <div class="detail supArea">{{Math.round(selectedMapArea)}}</div>
+                    <div class="detail supArea">{{Math.round(selectedMapArea * 100) / 100 | float}}</div>
                     <i class="delete icon"></i>
                   </div>
                   <div class="ui fluid popup">
@@ -91,11 +91,11 @@
           <h3>Alloggi trovati {{housesFiltered.length}}</h3>
           <div class="ui center aligned basic segment">
             <div class="ui buttons toggleView">
-              <button class="ui button icon active houseListToggle" data-show="houselistview">
+              <button class="ui button icon active houseListToggle" data-show="houselist">
                 <i class="list layout icon"></i>Elenco
               </button>
               <div class="or" data-text="o"></div>
-              <button class="ui button icon houseMapToggle" data-show="housemapview">
+              <button class="ui button icon houseMapToggle" data-show="housemap">
                 <i class="map icon"></i>
                 Mappa
               </button>
@@ -104,8 +104,10 @@
         </div>
       </div>
     </div>
-    <house-list v-ref:houselistview :houses='housesFiltered'></house-list>
-    <g-mapview v-ref:housemapview :houses='housesFiltered'></g-mapview>
+    <div class="houseViews">
+      <house-list v-show="showhouselist" v-ref:houselist :houses='housesFiltered'></house-list>
+      <g-mapview v-show="showhousemap" v-ref:housemap :houses='housesFiltered'></g-mapview>
+    </div>
   </div>
 </template>
 
@@ -165,7 +167,9 @@ export default {
       locRange: [],
       mqRange: [],
       mapFilterFn: false,
-      selectedMapArea: 0
+      selectedMapArea: 0,
+      showhouselist: false,
+      showhousemap: false
     }
   },
   computed: {
@@ -214,12 +218,12 @@ export default {
           return mapFilterFn(h.geo)
         })
       } else {
-        if (provSelected.length) {
+        if (provSelected.length && provSelected.join().length) {
           houses = houses.filter((h) => {
             return provSelected.indexOf(h.indirizzo[3]) !== -1
           })
         }
-        if (citySelected.length) {
+        if (citySelected.length && citySelected.join().length) {
           houses = houses.filter((h) => {
             return citySelected.indexOf(h.indirizzo[2]) !== -1
           })
@@ -250,13 +254,19 @@ export default {
       if (!val) {
         this.$set('mapFilterFn', false)
         this.$broadcast('clearMapFilter')
+        $('.toc .form .ui.dropdown').removeClass('disabled')
+      } else {
+        $('.toc .form .ui.dropdown').addClass('disabled')
+        if (this.proviceFilter.length || this.cityFilter.length) {
+          $('.toc .form .ui.dropdown').dropdown('clear')
+        }
       }
     }
   },
   events: {
     mapFilterFn: function (constainsLocFn, area) {
-      this.$set('mapFilterFn', constainsLocFn)
       this.$set('selectedMapArea', area)
+      this.$set('mapFilterFn', constainsLocFn)
     }
   },
   ready: function () {
@@ -328,18 +338,15 @@ export default {
       const showCmp = $btn.data('show')
       const hideCmp = sib.data('show')
       const vue = this
-
       sib.removeClass('active')
       const cmp = vue.$refs[showCmp]
-      if (!$(cmp.$el).transition('is visible')) {
-        $(cmp.$el).transition({
-          behavior: 'show',
-          onComplete: function () {
-            vue.$broadcast(evtName, cmp)
-          }
-        })
+      this.$set('show' + hideCmp, false)
+      if (!this['show' + showCmp]) {
+        this.$set('show' + showCmp, true)
+        setTimeout(function () {
+          vue.$broadcast(evtName, cmp)
+        }, 50)
       }
-      $(vue.$refs[hideCmp].$el).transition('hide')
     },
     setupDeleteSelectedArea: function () {
       const $popup = $('.selectedArea .delete')
@@ -365,13 +372,13 @@ export default {
 #app {
   color: #2c3e50;
   font-family: Source Sans Pro, Helvetica, sans-serif;
+  width: 100%;
   display: flex;
   flex-direction: row;
 
   > .toc {
-    flex: 0 0 auto;
+    flex: 0 0 280px;
     position: relative;
-    width: 280px;
     z-index: 1;
     
     .menu .item.header {
@@ -384,6 +391,10 @@ export default {
       padding: 0;
     }
     
+  }
+
+  > .houseViews {
+    flex: 1 1;
   }
 }
 

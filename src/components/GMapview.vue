@@ -24,15 +24,14 @@
         </div>
       </div>
     </div>
-    <div class="pathActions ui container transition hidden">
+    <div class="pathActions transition hidden">
       <div class="ui buttons">
         <button class="ui button icon erasePath">
           <i class="erase icon"></i>Cancella
         </button>
         <div class="or" data-text="o"></div>
         <button class="ui button positive icon confirmPath">
-          <i class="checkmark icon"></i>
-          Conferma
+          <i class="checkmark icon"></i>Conferma
         </button>
       </div>
     </div>
@@ -240,11 +239,13 @@ export default {
 .mapView, map {
   width: 100%;
   height: 600px;
+  position: relative;
 }
 .pathActions {
   position: absolute;
   bottom: 20px;
   text-align: center;
+  width: 100%;
 
   .buttons {
     width: 50%;
