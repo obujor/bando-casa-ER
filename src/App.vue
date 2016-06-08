@@ -5,7 +5,10 @@
         <div class="item header">
           <a class="ui image" href="/"><img class="logo" src="./assets/logo.png"></a>
         </div>
-        <div class="item">
+        <div  class="ui horizontal divider">
+          Bando <div v-if="pubYear" class="ui blue tag label">{{pubYear}}</div>
+        </div>
+        <div class="item filters">
           <h3>Filtri</h3>
           <div class="ui styled fluid accordion">
             <div class="title">
@@ -169,7 +172,8 @@ export default {
       mapFilterFn: false,
       selectedMapArea: 0,
       showhouselist: false,
-      showhousemap: false
+      showhousemap: false,
+      pubYear: 0
     }
   },
   computed: {
@@ -278,6 +282,7 @@ export default {
                         ? item.supUtile.camere.length : 0
         return item
       })
+      this.$set('pubYear', 2015)
       this.$set('allHouses', data)
     })
     $('.toc select.dropdown').dropdown({
@@ -384,6 +389,13 @@ export default {
     .menu .item.header {
       padding: 0 0.2em;
       text-align: center;
+    }
+
+    .ui.menu .item.filters {
+      padding-top: 0;
+      &::before {
+        background: transparent none repeat scroll 0 0;
+      }
     }
 
     .ui.segment {
