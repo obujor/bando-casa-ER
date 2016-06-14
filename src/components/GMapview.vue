@@ -1,7 +1,6 @@
 <template>
   <div class="mapView">
-    <map :map-type-id.sync="mapType" :center.sync="center" :zoom.sync="zoom" :options="{minZoom: 8}"
-          @g-dragend="mapDragged" @g-click="mapClicked">
+    <map :map-type-id.sync="mapType" :center.sync="center" :zoom.sync="zoom" :bounds.sync="mapBounds" :options="{minZoom: 8}" @g-click="mapClicked">
       <polygon :paths.sync="border" :editable="false" :options="{geodesic:false, strokeColor:'#000000', fillColor:'#000000', strokeWeight: 2}">
       </polygon>
       <polygon v-if="filterPathPolyVisible" :paths.sync="filterPath" :editable="true" :options="{geodesic:false, strokeColor:'#2185d0', fillColor:'#15FF00', strokeWeight: 5}">
@@ -81,7 +80,7 @@ export default {
       mapType: 'roadmap',
       zoom: 8,
       shown: false,
-      limitBounds: [{lat: 43.23050, lng: 9.50790}, {lat: 45.82774, lng: 12.97657}],
+      mapBounds: {},
       border: [],
       filterPathVisible: false,
       filterPathPolyVisible: false,
@@ -132,6 +131,11 @@ export default {
     markers: function () {
       if (this.$clusterObject) {
         this.showMarkers(true, true)
+        var bounds = new window.google.maps.LatLngBounds()
+        this.markers.forEach((marker) => {
+          bounds.extend(new window.google.maps.LatLng(marker.position.lat, marker.position.lng))
+        })
+        this.mapObject.fitBounds(bounds)
       }
     }
   },
@@ -152,22 +156,6 @@ export default {
         this.filterPath.push(this.filterPath[0])
         this.setFilterPathVisibility(false, true)
       }
-    },
-    mapDragged: function () {
-      // TODO: finish the limit
-      // console.log(this.center)
-      // if (this.strictBounds.contains(this.mapObject.getCenter())) return
-      // // Set the center in order to limit the dragging
-      // var lat = this.center.lat
-      // var lng = this.center.lng
-      // if (lat < this.limitBounds[0].lat) lat = this.limitBounds[0].lat
-      // if (lat > this.limitBounds[1].lat) lat = this.limitBounds[1].lat
-      // if (lng < this.limitBounds[0].lng) lng = this.limitBounds[0].lng
-      // if (lng > this.limitBounds[1].lng) lng = this.limitBounds[1].lng
-
-      // this.$set('center', {lat: lat, lng: lng})
-      // console.log('dragged')
-      // console.log(this)
     },
     showMarkers: function (show, forceUpdate) {
       if (show && this.markersShown && !forceUpdate) return
@@ -215,11 +203,6 @@ export default {
     var mapCmp = cmp.$children[0]
     mapCmp.mapCreated.then((mapObject) => {
       cmp.$clusterObject = new window.MarkerClusterer(mapObject, cmp.createGmarkers(), clusterOptions)
-      var strictBounds = new window.google.maps.LatLngBounds(
-        new window.google.maps.LatLng(cmp.limitBounds[0].lat, cmp.limitBounds[0].lng),
-        new window.google.maps.LatLng(cmp.limitBounds[1].lat, cmp.limitBounds[1].lng)
-      )
-      cmp.strictBounds = strictBounds
       cmp.mapObject = mapObject
     })
 
