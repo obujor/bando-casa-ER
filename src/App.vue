@@ -9,7 +9,10 @@
           Bando <div v-if="pubYear" class="ui blue tag label">{{pubYear}}</div>
         </div>
         <div class="item filters">
-          <h3>Filtri</h3>
+          <h3>Filtri <button class="ui compact right floated icon circular button clearFilters" data-content="Azzera i filtri">
+            <i class="refresh icon"></i>
+          </button></h3>
+
           <div class="ui styled fluid accordion">
             <div class="title">
               <i class="dropdown icon"></i>
@@ -295,6 +298,7 @@ export default {
     })
     this.setupToggleView()
     this.setupDeleteSelectedArea()
+    this.setupFilterClear()
   },
   methods: {
     setupSliders: function () {
@@ -366,6 +370,22 @@ export default {
       $('.selectedArea .popup .negative').click(() => {
         $popup.popup('hide')
         this.$set('selectedMapArea', 0)
+      })
+    },
+    setupFilterClear: function () {
+      const $btn = $('.clearFilters')
+      $btn.popup()
+      $btn.click(() => {
+        $('.toc .form .ui.dropdown').dropdown('clear')
+        this.$set('selectedMapArea', 0)
+        $('#priceSlider').data('ionRangeSlider').reset()
+        $('#pricemqSlider').data('ionRangeSlider').reset()
+        $('#locSlider').data('ionRangeSlider').reset()
+        $('#mqSlider').data('ionRangeSlider').reset()
+        this.priceRange = []
+        this.priceMqRange = []
+        this.locRange = []
+        this.mqRange = []
       })
     }
   }
