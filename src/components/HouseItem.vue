@@ -19,7 +19,10 @@
       <div v-show="showDetails" class="description">
         <div class="ui segments">
           <div class="ui segment">
-            <h3>Superficie utile <span class="mq">{{house.supUtile.totale | float}}</span></h3>
+            <h3>
+              Superficie utile <span class="mq">{{house.supUtile.totale | float}}</span>
+              <a class="ui large blue top right attached label" v-on:click="showOnMap"><i class="map icon"></i>Visualizza sulla mappa</a>
+            </h3>
           </div>
           <div class="ui horizontal segments">
             <div v-if="house.supUtile.ingresso" class="ui segment">
@@ -105,6 +108,9 @@ export default {
     itemToggleDetail: function (evt) {
       if ($(evt.target).is('a')) return
       this.showDetails = !this.showDetails
+    },
+    showOnMap: function () {
+      this.$dispatch('showOnMap', this.house)
     }
   }
 }

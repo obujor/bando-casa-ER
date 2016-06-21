@@ -274,6 +274,10 @@ export default {
     mapFilterFn: function (constainsLocFn, area) {
       this.$set('selectedMapArea', area)
       this.$set('mapFilterFn', constainsLocFn)
+    },
+    showOnMap: function (house) {
+      this.toggleView($('.toggleView .houseMapToggle'))
+      this.$broadcast('showOnMap', house)
     }
   },
   ready: function () {

@@ -1,6 +1,6 @@
 <template>
   <div class="mapView">
-    <map :map-type-id.sync="mapType" :center.sync="center" :zoom.sync="zoom" :bounds.sync="mapBounds" :options="{minZoom: 8}" @g-click="mapClicked">
+    <map :map-type-id.sync="mapType" :center.sync="center" :zoom.sync="zoom" :bounds.sync="mapBounds" :options="{minZoom: 8, maxZoom: 20}" @g-click="mapClicked">
       <polygon :paths.sync="border" :editable="false" :options="{geodesic:false, strokeColor:'#000000', fillColor:'#000000', strokeWeight: 2}">
       </polygon>
       <polygon v-if="filterPathPolyVisible" :paths.sync="filterPath" :editable="true" :options="{geodesic:false, strokeColor:'#2185d0', fillColor:'#15FF00', strokeWeight: 5}">
@@ -9,6 +9,11 @@
       </polygon>
       <polyline v-if="filterPathVisible" :path.sync="filterPath" :editable="true" :options="{strokeColor:'#2185d0', strokeWeight: 5}" @g-click="pathClicked">
       </polyline>
+      <info-window v-if="infoWindowShow" :position="infoWindowPos" :opened.sync="infoWindowShow">
+        <div class="ui big relaxed divided selection list">
+          <house-item-mini v-for="house in infoWindowHouses" :house='house'></house-item-mini>
+        </div>
+      </info-window>
     </map>
     <div class="ui dimmer">
       <div class="content">
@@ -38,8 +43,10 @@
 </template>
 
 <script>
-import {load, Map, Polygon, Polyline} from 'vue-google-maps'
+import {load, Map, Polygon, Polyline, InfoWindow} from 'vue-google-maps'
+import HouseItemMini from './HouseItemMini'
 import $ from 'jquery'
+import _ from 'underscore'
 // Using directly js-marker-clusterer instead of Marker and Cluser of vue-google-maps
 // because of performace reasons, there're a lot of markers to show
 require('js-marker-clusterer')
@@ -48,7 +55,6 @@ require('js-marker-clusterer')
 if (!window.google || !window.google.maps) {
   load('KEY', false, ['geometry'])
 }
-
 const clusterOptions = {
   gridSize: 50,
   styles: [{
@@ -86,7 +92,10 @@ export default {
       filterPathPolyVisible: false,
       choosenPathPolyVisible: false,
       filterPath: [],
-      markersShown: false
+      markersShown: false,
+      infoWindowPos: {lat: 0, lng: 0},
+      infoWindowShow: false,
+      infoWindowHouses: []
     }
   },
   computed: {
@@ -94,6 +103,7 @@ export default {
       return this.houses.map(function (house) {
         return {
           position: {lat: house.geo[0], lng: house.geo[1]},
+          data: house,
           draggable: false,
           clickable: true,
           icon: '/static/apartment-marker.png'
@@ -125,25 +135,37 @@ export default {
     },
     clearMapFilter: function () {
       this.filterPath = []
+    },
+    showOnMap: function (house) {
+      house.position = {lat: house.geo[0], lng: house.geo[1]}
+      _.delay(() => {
+        this.showInfoWindow([{data: house}], house.position)
+        this.fitBoundsToMarkers([house])
+      }, 100)
     }
   },
   watch: {
     markers: function () {
       if (this.$clusterObject) {
         this.showMarkers(true, true)
-        var bounds = new window.google.maps.LatLngBounds()
-        this.markers.forEach((marker) => {
-          bounds.extend(new window.google.maps.LatLng(marker.position.lat, marker.position.lng))
-        })
-        this.mapObject.fitBounds(bounds)
+        this.fitBoundsToMarkers(this.markers)
       }
     }
   },
   methods: {
     createGmarkers: function () {
-      return this.markers.map(function (data) {
-        return new window.google.maps.Marker(data)
+      return this.markers.map((data) => {
+        const marker = new window.google.maps.Marker(data)
+        marker.addListener('click', this.showInfoWindow.bind(this, [marker]))
+        return marker
       })
+    },
+    showInfoWindow: function (markers, pos) {
+      const targetMarker = markers[0]
+      pos = targetMarker.getPosition ? targetMarker.getPosition().toJSON() : pos
+      this.infoWindowPos = pos
+      this.infoWindowHouses = _.pluck(markers, 'data')
+      this.infoWindowShow = true
     },
     mapClicked: function (mouseArgs) {
       if (this.filterPathVisible) {
@@ -188,6 +210,13 @@ export default {
       } else {
         $('.pathActions').addClass('hidden')
       }
+    },
+    fitBoundsToMarkers: function (markers) {
+      var bounds = new window.google.maps.LatLngBounds()
+      markers.forEach((marker) => {
+        bounds.extend(new window.google.maps.LatLng(marker.position.lat, marker.position.lng))
+      })
+      this.mapObject.fitBounds(bounds)
     }
   },
   ready: function () {
@@ -203,6 +232,11 @@ export default {
     var mapCmp = cmp.$children[0]
     mapCmp.mapCreated.then((mapObject) => {
       cmp.$clusterObject = new window.MarkerClusterer(mapObject, cmp.createGmarkers(), clusterOptions)
+      window.google.maps.event.addListener(cmp.$clusterObject, 'clusterclick', (cluster) => {
+        if (mapObject.getZoom() === mapObject.maxZoom) {
+          this.showInfoWindow(cluster.getMarkers())
+        }
+      })
       cmp.mapObject = mapObject
     })
 
@@ -212,7 +246,9 @@ export default {
   components: {
     Map,
     Polygon,
-    Polyline
+    Polyline,
+    InfoWindow,
+    HouseItemMini
   }
 }
 
