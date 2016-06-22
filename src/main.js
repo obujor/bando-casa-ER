@@ -1,7 +1,12 @@
 import Vue from 'vue'
 import App from './App'
+import Home from './Home'
+import Browser from './Browser'
+import VueRouter from 'vue-router'
 
 Vue.use(require('vue-resource'))
+Vue.use(VueRouter)
+
 Vue.config.debug = true
 
 Vue.filter('euro', function (value) {
@@ -19,8 +24,14 @@ Vue.filter('capitalizeWords', function (value) {
   }).join(' ').replace(/' /g, '\'')
 })
 
-/* eslint-disable no-new */
-new Vue({
-  el: 'body',
-  components: { App }
+var router = new VueRouter()
+router.map({
+  '/': {
+    component: Home
+  },
+  '/browser': {
+    component: Browser
+  }
 })
+
+router.start(App, '#container')
