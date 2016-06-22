@@ -119,6 +119,7 @@ export default {
           this.$broadcast('g-resize-map')
         }
         this.showMarkers(true)
+        this.fitBoundsToMarkers(this.markers)
       }
     },
     showMapFilter: function () {
