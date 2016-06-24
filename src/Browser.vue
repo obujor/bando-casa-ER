@@ -3,7 +3,7 @@
     <div class="toc">
       <div class="ui left fixed vertical menu">
         <div class="item header">
-          <a class="ui image" href="/"><img class="logo" src="./assets/logo.png"></a>
+          <a class="ui image" v-link="{ path: '/' }"><img class="logo" src="./assets/logo.png"></a>
         </div>
         <div  class="ui horizontal divider">
           Bando <div v-if="pubYear" class="ui blue tag label">{{pubYear}}</div>
