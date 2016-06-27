@@ -36,18 +36,21 @@
           <i class="euro icon"></i>
           <div class="content">
             <div class="header">Prezzo</div>
-            <div class="description"></div>
+            <div class="description">E' possibile scegliere un intervallo di valori desiderati sia per il prezzo complessivo che per il prezzo a metro quadro.</div>
           </div>
         </div>
         <div class="item">
           <i class="square outline icon"></i>
           <div class="content">
             <div class="header">Dimensione</div>
-            <div class="description"></div>
+            <div class="description">E' possibile scegliere un intervallo di valori desiderati per il numero di locali e per la superficie complessiva dell'immobile.</div>
           </div>
         </div>
       </div>
-      <h3 class="ui header">Ordinamento</h3>
+      <h3 class="ui header">Elenco</h3>
+      <img class="ui centered big bordered rounded image" src="./assets/listView.png">
+      <h3 class="ui header">Mappa</h3>
+      <img class="ui centered big bordered rounded image" src="./assets/mapView.jpg">
       <div class="ui basic center aligned segment">
         <div class="ui huge primary button" v-link="{ path: '/browser' }">Avvia la visualizzazione<i class="right arrow icon"></i></div>
       </div>
