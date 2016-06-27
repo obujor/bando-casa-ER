@@ -104,7 +104,7 @@ export default {
     var vue = this
     $('.houseList .dropdown.listOrdering').dropdown()
 
-    $('#app .houseList').visibility({
+    $('.houseList').visibility({
       once: false,
       // update size when new content loads
       observeChanges: true,
