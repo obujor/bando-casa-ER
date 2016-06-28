@@ -219,7 +219,6 @@ export default {
       }
 
       var houses = this.allHouses
-      console.time('filter')
       if (mapFilterFn) {
         houses = houses.filter((h) => {
           return mapFilterFn(h.geo)
@@ -248,7 +247,6 @@ export default {
       if (mqRange.length) {
         houses = houses.filter(rangeFilter.bind(this, 'mq', mqRange))
       }
-      console.timeEnd('filter')
       this.$broadcast('filtersChanged')
       return houses
     }

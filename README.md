@@ -2,6 +2,8 @@
 
 > Applicazione web per la visualizzazione degli alloggi pubblicati nel Bando Giovani Coppie e altri nuclei familiari dell'Emilia Romagna
 
+# Per sviluppatori
+
 ## Build Setup
 
 ``` bash
