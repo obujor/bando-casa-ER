@@ -279,7 +279,7 @@ export default {
     }
   },
   ready: function () {
-    this.$http({url: '/static/data_2015_lz.json', method: 'GET'}).then(function (response) {
+    this.$http({url: 'static/data_2015_lz.json', method: 'GET'}).then(function (response) {
       var data = JSON.parse(LZString.decompressFromUTF16(response.data))
       data = data.map(function (item) {
         item.locali = item.supUtile.soggiorno !== undefined ? 1 : 0

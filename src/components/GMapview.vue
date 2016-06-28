@@ -58,19 +58,19 @@ if (!window.google || !window.google.maps) {
 const clusterOptions = {
   gridSize: 50,
   styles: [{
-    url: '/static/cluster/m1.png',
+    url: 'static/cluster/m1.png',
     height: 53,
     width: 53,
     textColor: '#FFFFFF',
     textSize: 14
   }, {
-    url: '/static/cluster/m2.png',
+    url: 'static/cluster/m2.png',
     height: 56,
     width: 56,
     textColor: '#FFFFFF',
     textSize: 14
   }, {
-    url: '/static/cluster/m3.png',
+    url: 'static/cluster/m3.png',
     height: 65,
     width: 65,
     textColor: '#FFFFFF',
@@ -106,7 +106,7 @@ export default {
           data: house,
           draggable: false,
           clickable: true,
-          icon: '/static/apartment-marker.png'
+          icon: 'static/apartment-marker.png'
         }
       })
     }
@@ -222,7 +222,7 @@ export default {
   },
   ready: function () {
     var cmp = this
-    this.$http({url: '/static/ER-border.json', method: 'GET'}).then(function (response) {
+    this.$http({url: 'static/ER-border.json', method: 'GET'}).then(function (response) {
       var data = response.data
       var toGeo = function (item) {
         return {lat: item[0], lng: item[1]}

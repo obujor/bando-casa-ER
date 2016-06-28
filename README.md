@@ -2,6 +2,8 @@
 
 > Applicazione web per la visualizzazione degli alloggi pubblicati nel Bando Giovani Coppie e altri nuclei familiari dell'Emilia Romagna
 
+[Demo applicazione](https://obujor.github.io/bando-casa-ER/)
+
 # Per sviluppatori
 
 ## Build Setup
