@@ -60,20 +60,26 @@
       <div class="ui container">
         <div class="ui stackable inverted divided equal height stackable grid">
           <div class="three wide column">
-            <h4 class="ui inverted header">About</h4>
+            <h4 class="ui inverted header">Sviluppato da</h4>
+            <img src="./assets/octavian.jpg" class="ui avatar tiny left floated image">
+            Octavian Bujor
             <div class="ui inverted link list">
-              <a href="#" class="item"></a>
+              <a class="ui inverted circular icon button" href="https://github.com/obujor" target="_blank"><i class="github icon"></i></a>
+              <a class="ui inverted circular icon button" href="https://it.linkedin.com/in/octavian-bujor-6b436790" target="_blank"><i class="linkedin icon"></i></a>
             </div>
           </div>
           <div class="three wide column">
-            <h4 class="ui inverted header"></h4>
+            <h4 class="ui inverted header">Link</h4>
             <div class="ui inverted link list">
-              <a href="#" class="item"></a>
+              <a href="http://www.regione.emilia-romagna.it/" class="item" target="_blank">Regione Emilia-Romagna</a>
+              <a href="http://territorio.regione.emilia-romagna.it/bandi-di-gara/bando-giovani-coppie-e-altri-nuclei-familiari" class="item" target="_blank">Bando 2015</a>
+              <a href="http://territorio.regione.emilia-romagna.it/notizie/casagiov" class="item" target="_blank">Graduatorie 2015</a>
             </div>
           </div>
-          <div class="seven wide column">
-            <h4 class="ui inverted header"></h4>
-            <p></p>
+          <div class="ten wide column">
+            <h4 class="ui inverted header">Note legali </h4>
+            <p>La fonte dei dati originali (le coordinate geografiche escluse) è la <a href="http://www.regione.emilia-romagna.it/" target="_blank">Regione Emilia-Romagna.</a></p>
+            <p>Le coordinate geografiche sono state generate automaticamente usando diversi servizi di Geocoding quindi non si offre nessuna garanzia sulla loro accuratezza!</p>
           </div>
         </div>
       </div>
